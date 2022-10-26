@@ -56,7 +56,12 @@ gr <- df %>%
   filter(party %in% c("CON", "LAB", "LD")) %>%
   data_grid(Borough_code, party,position_within=c(1,2,3))
 
-ggplot(db)+geom_col(aes(x=c(party),y = elected, fill=factor(-position_within)), position = "dodge")+coord_flip()+facet_wrap(~Borough_name)
+ggplot(db)+geom_col(aes(x=c(party),y = elected, fill=factor(-position_within)), position = "dodge")+coord_flip()+scale_fill_brewer()+facet_wrap(~Borough_name)
+
+db %>% 
+  mutate(position_within=as.factor(position_within)) %>% 
+  mutate(position_within=factor(position_within, levels=rev(levels(position_within)))) %>%
+  ggplot()+geom_col(aes(x=c(party),y = elected, fill=position_within), position = "dodge")+coord_flip()+scale_fill_brewer()+facet_wrap(~Borough_name)
 
 summaryBiasByBorough <-df %>% 
   group_by(Borough_name,position_within,party) %>%
