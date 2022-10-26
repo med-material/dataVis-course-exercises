@@ -5,7 +5,9 @@ library(tidyverse)
 library(here)
 library(modelr)
 
-df <- read.csv(here("exercises", "ws06-tableData", "election exercise", "london_council_election_2014_ward.csv"))
+df <- read.csv(here("exercises", "ws06-tableData", "election exercise", "london_council_election_2014_ward.csv"),fileEncoding = "UTF-8-BOM")
+df$number_votes <- as.numeric(df$number_votes)
+
 
 # create the position for each candidate in alphabetical order per ward and party
 df <- df %>%
@@ -23,17 +25,15 @@ df <- df %>%
   mutate(position_overall = 1:n()) %>% 
   ungroup()
 
-votingRankInParty
-
 
 #starting letter of candidate
 df$startingLetterCandidate <- substr(df$candidate,1,1)
 
-wm <- df %>% 
+df <- df %>% 
   group_by(Ward_code, party) %>%
   dplyr::summarise(partyVotesInWard=sum(as.numeric(number_votes))) %>%
-  ungroup()
-df %>% merge(wm)
+  ungroup() %>%
+  merge(df)
 
 # create countable numbers based on elected flag
 db <- df %>%
@@ -41,7 +41,13 @@ db <- df %>%
   group_by(Borough_name, party, position_within) %>%
   summarise(elected = sum(ifelse(elected_flag == "Yes", 1, 0)))
 
-
+df<- df %>%
+  filter(party %in% c("CON", "LAB", "LD")) %>%
+  group_by(Ward_code, party) %>%
+  summarize(VotesForParty=sum(number_votes)) %>% 
+  right_join(df) %>% ungroup() %>%
+  mutate(differenceFromExpected=number_votes/VotesForParty-1/Number.of.councillors.in.ward)
+  
 
 # create a data grid with all combinations of borough and party, in case some parties were not present in the borough
 gr <- df %>%
