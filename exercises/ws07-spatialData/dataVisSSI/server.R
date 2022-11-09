@@ -128,20 +128,7 @@ server <- (function(input, output) {
         values = ~dcr7dPer100k,
         title = "Incidens de seneste 7 dage"
       ) 
-      #%>%
-      # addLogo(
-      #   img, 
-      #   position = "bottomleft",
-      #   width = 100,
-      #   height = 100
-      # )
-    
-    # addRectangles(
-    #   lng1 = 11.8821, lat1 = 55.8711, 
-    #   lng2 = 12.7746, lat2 = 55.5536, 
-    #   fillColor = "transparent",
-    # )
-
+  
     for (i in 1:nrow(a_one_date)) {
       map <- map %>%
         addPolylines(
