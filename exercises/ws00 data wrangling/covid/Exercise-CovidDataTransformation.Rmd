@@ -26,21 +26,20 @@ dsize
 
 ```{r dc-diagnosedCases, include=TRUE}
 # make data tidy
-dc %<>% 
-  #use pivot_longer to transpose all columns (apart from date_sample) to two columns ('kommune','testsConducted') that hold the name of the kommune and the values of the number of diagnosed cases
-  pivot_longer(XXXXXX) %>% 
+dc <- dc %>%
+  # use pivot_longer to transpose all columns (apart from date_sample) to two columns ('kommune', 'casesDiagnosed') that hold the name of the kommune and the values of the number of diagnosed cases
+  pivot_longer(cols = !date_sample, XXXXXX) %>%
   arrange(kommune, date_sample)
 dc
 ```
 
 ```{r testedPeople, include=TRUE}
-dt %<>% 
-  #use pivot_longer to transpose all columns (apart from PrDate_adjusted) to two columns ('kommune','testsConducted') that hold the name of the kommune and the values of the number of conducted tests 
-  pivot_longer(XXXXX) %>%
+dt <- dt %>%
+  # use pivot_longer to transpose all columns (apart from PrDate_adjusted) to two columns ('kommune','testsConducted') that hold the name of the kommune and the values of the number of conducted tests
+  pivot_longer(cols = !PrDate_adjusted, XXXXX) %>%
   arrange(kommune, PrDate_adjusted) %>%
   rename(date_sample = PrDate_adjusted) %>%
   filter(!(kommune == "X101"))
-
 ```
 
 ```{r NAtests, include=TRUE}
@@ -51,17 +50,16 @@ sum(is.na(dsize$Befolkningstal))
 ```
 
 ```{r columnRenaming, include=TRUE}
-# make data compatible rename columns for merging 
+# make data compatible rename columns for merging
 dsize <- dsize %>%
   select(contains("Kom"), Befolkningstal) %>%
   rename("kID" = `Kommune_(id)`, "kommune" = `Kommune_(navn)`, population = Befolkningstal) %>%
   mutate(population = population * 1000) %>%
   select(-kID)
-
 ```
 
 ```{r keyCheck, include=TRUE}
-# check Kommune name can be used as key
+# check Kommune name can be used as key for merging, in SQL this operation is referred to as a join
 dc[!(dc$kommune %in% dsize$kommune), ]$kommune
 dsize[!(dsize$kommune %in% dt$kommune), ]$kommune
 dt[!(dt$kommune %in% dsize$kommune), ]$kommune
@@ -71,70 +69,65 @@ dt[!(dt$kommune %in% dsize$kommune), ]$kommune
 # ooops!
 # for some reason one data frame uses Københaven the other Copenhagen), - use str_replace to change "København", "Copenhagen"
 dsize$kommune <- str_replace(dsize$kommune, "København", "Copenhagen")
-
-# check again keys are clean OK re-run rows 35-37
-
+# check again keys are clean OK 
+dc[!(dc$kommune %in% dsize$kommune), ]$kommune
+dsize[!(dsize$kommune %in% dt$kommune), ]$kommune
+dt[!(dt$kommune %in% dsize$kommune), ]$kommune
 # merge data together
 dc <- merge(dc, dsize)
 dt <- merge(dt, dsize)
-
 ```
 
 ```{r DeriveVariablesCases, include=TRUE}
-
-# create new variables within mutate 
-# (e.g. rolling aggregates with roll_sum - cases of the last seven days) - 
-# numbers per 1000 people 
-# use the lag function to compute the differences between a days (7day sum) value and the one from 7 days (3, and 1) ago
+# create new variables within mutate
+# (e.g. 
+# diagnosed cases on the day per 100'000 people (dcr100k),
+# rolling aggregates with roll_sum - newly diagnosed cases of the last seven days (dcr7d),
+# compute dcr7d per 100k inhabitants (dcr7dPer100k)
+# use the lag function to compute the differences between a days (7day sum) value and the one from 7 days ago (dcr7dPer100kCh7)
 #
-dc %<>% 
+dc <- dc %>%
   group_by(kommune) %>%
-  arrange(kommune,date_sample) %>%
-  mutate(dcr100k = XXX, 
-         dcr7d = XXX,
-         dcr7dPer100k= XXX,
-         dcr7dPer100kCh1 = XXX,
-         dcr7dPer100kCh3 = XXX,
-         dcr7dPer100kCh7 = XXX
-         )
-
+  arrange(kommune, date_sample) %>%
+  mutate(
+    dcr100k = XXX,
+    dcr7d = XXX,
+    dcr7dPer100k = XXX,
+    dcr7dPer100kCh7 = XXX
+  )
 dc
 ```
 
 ```{r DeriveVariablesTests}
-# create new variables within mutate 
-# (e.g. rolling aggregates with roll_sum - cases of the last seven days) - 
-# numbers per 1000 people 
-# use the lag function to compute the differences between a days (7day sum) value and the one from 7 days (3, and 1) ago
-dt %<>% 
-  group_by(kommune) %>% 
-  arrange(kommune,date_sample) %>%
-  mutate(tr100k = XXX, 
-         tr7d = XXX, 
-         tr7dP100k = XXX,
-         tr7dP100kCh1 = XXX,
-         tr7dP100kCh3 = XXX,
-         tr7dP100kCh7 = XXX
-         )
+# create new variables within mutate
+# (e.g. 
+# tested numbers per 1000 people (tr100k)
+# rolling aggregates with roll_sum - cases of the last seven days (tr7d) - and per 100k inhabitants (tr7dP100k)
+# use the lag function to compute the differences between a day's (7day sum) value and the one from 7 days ago (tr7dP100kCh7)
+dt <- dt %>%
+  group_by(kommune) %>%
+  arrange(kommune, date_sample) %>%
+  mutate(
+    tr100k = XXX,
+    tr7d = XXX,
+    tr7dP100k = XXX,
+    tr7dP100kCh7 = XXX
+  )
 dt
 ```
 
 ```{r Merge}
 # merge test with case data (on shared keys - date_sample+kommune)
-df <- merge(dc, dt)
+df <- as_tibble(merge(dc, dt))
 df
-
-#create test positive variables 
-df %<>% 
+# create test positive variables
+dc <- dc %>%
   mutate(
     PosTestRateOnDay = dcr100k / tr100k,
-    PosTestRate7d = dcr7dPer100k / tr7dP100k, 
+    PosTestRate7d = dcr7dPer100k / tr7dP100k,
   )
-    
-
 # check there were no diagnosis without tests
 sum(df$casesDiagnosed > df$testsConducted)
 ```
 
-## Covid data analysis DK overview
-
+## Covid data analysis DK overview - 
