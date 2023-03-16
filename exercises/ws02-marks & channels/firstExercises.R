@@ -1,19 +1,21 @@
 # 
 # 
-
+install.packages("esquisse")
 library(tidyverse)
+library(esquisse)
+library(skimr)
+
+
 mpg
 as.data.frame(mpg)
  
 glimpse(mpg)
 
-library(skimr)
 skim(mpg)
 
-ggplot(mpg, aes(x = class, y = drv)) +
-  geom_count()
 
 
+ggplot(mpg, aes(x = class, y = drv)) +  geom_count()
 
 mpg %>%
   count(class, drv) %>%
