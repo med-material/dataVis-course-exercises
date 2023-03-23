@@ -4,6 +4,7 @@
 library(tidyverse)
 library(here)
 library(modelr)
+library(numbers)
 
 df <- read.csv(here("exercises", "ws05-tableData", "election exercise", "london_council_election_2014_ward.csv"),fileEncoding = "UTF-8-BOM")
 df$number_votes <- as.numeric(df$number_votes)
@@ -52,7 +53,24 @@ df<- df %>%
   
 
 # create a data grid with all combinations of borough and party, in case some parties were not present in the borough
-gr <- df %>%
+wardRowsCols <- df %>% 
+  select(Borough_name,Ward_name,Borough_code,Ward_code) %>% 
+  arrange(Borough_name,Ward_name) %>% 
+  select(-c(Borough_name,Ward_name,)) %>% 
+  unique() %>% 
+  mutate(WardNum=1:n(),
+      WardCol= WardNum %% 30,
+      WardRow= div(WardNum, 30)+1)
+
+wardgrid <- df %>%
+  arrange(Borough_name,Ward_name) %>%
+  filter(party %in% c("CON", "LAB", "LD")) %>%
+  data_grid(Ward_code, party,position_within=c(1,2,3)) %>%
+  left_join(wardRowsCols)
+
+
+boroughgrid <- df %>%
+  arrange(Borough_name,Ward_name) %>%
   filter(party %in% c("CON", "LAB", "LD")) %>%
   data_grid(Borough_code, party,position_within=c(1,2,3))
 
@@ -62,15 +80,29 @@ db %>%
   mutate(position_within=factor(position_within, levels=rev(levels(position_within)))) %>%
   ggplot(aes(x=party,y = elected))+geom_col(aes(fill=position_within), position = "dodge")+coord_flip()+scale_fill_brewer()+facet_wrap(~Borough_name) + scale_fill_manual(values = c("orange","white", "blue"))
 
-  
+summaryBiasByWard <-df %>% 
+  group_by(Ward_code,position_within,party) %>%
+  summarize(meanBias=sum(number_votes)/sum(VotesForParty)-(1/first(Number.of.councillors.in.ward))) %>%
+  right_join(wardgrid)
+
+# Try a plot below for summaryBiasByWard e.g. with geom_tile()
+
+
+
+
++ scale_fill_gradient2(midpoint = 0,
+                     low = 'green2',
+                     mid = 'yellow',
+                     high = 'red3',
+                     na.value = 'white')
+
 summaryBiasByBorough <-df %>% 
   group_by(Borough_name,position_within,party) %>%
-  summarize(meanBias=sum(number_votes)/sum(VotesForParty)-1/Number.of.councillors.in.ward)
+  summarize(meanBias=sum(number_votes)/sum(VotesForParty)-(1/sum(Number.of.councillors.in.ward)))
+
   
-  scale_fill_gradient2(
-    low = 'red', mid = 'white', high = 'blue',
-    midpoint = 0.7, guide = 'colourbar', aesthetics = 'fill'
-  )
+
+
 
   
 
