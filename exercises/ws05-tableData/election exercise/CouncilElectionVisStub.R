@@ -5,7 +5,7 @@ library(tidyverse)
 library(here)
 library(modelr)
 
-df <- read.csv(here("exercises", "ws06-tableData", "election exercise", "london_council_election_2014_ward.csv"),fileEncoding = "UTF-8-BOM")
+df <- read.csv(here("exercises", "ws05-tableData", "election exercise", "london_council_election_2014_ward.csv"),fileEncoding = "UTF-8-BOM")
 df$number_votes <- as.numeric(df$number_votes)
 
 
