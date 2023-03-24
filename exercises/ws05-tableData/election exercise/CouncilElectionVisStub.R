@@ -76,12 +76,17 @@ boroughgrid <- df %>%
 db %>% 
   mutate(position_within=as.factor(position_within)) %>% 
   mutate(position_within=factor(position_within, levels=rev(levels(position_within)))) %>%
-  ggplot(aes(x=party,y = elected))+geom_col(aes(fill=position_within), position = "dodge")+coord_flip()+scale_fill_brewer()+facet_wrap(~Borough_name) +theme_bw()+ scale_fill_manual(values = c("orange","yellow", "blue"))
+  ggplot(aes(x=party,y = elected))+geom_col(aes(fill=position_within), position = "dodge")+coord_flip()+scale_fill_brewer()+facet_wrap(~Borough_name) +theme_bw()+ scale_fill_manual(values = c("orange","yellow", "blue")) 
 
 summaryBiasByWard <-df %>% 
   group_by(Ward_code,position_within,party) %>%
   summarize(meanBias=sum(number_votes)/sum(VotesForParty)-(1/first(Number.of.councillors.in.ward))) %>%
-  right_join(wardgrid)
+  right_join(wardgrid) 
+
+summaryBiasByWardx <-df %>% 
+  select(Borough_code,Borough_name,Ward_code,Ward_name) %>%
+  unique() %>%
+  right_join(summaryBiasByWard, multiple = "all")
 
 # Try a plot below for summaryBiasByWard e.g. with geom_tile() that shows all! data
 
