@@ -83,7 +83,7 @@ summaryBiasByWard <-df %>%
   summarize(meanBias=sum(number_votes)/sum(VotesForParty)-(1/first(Number.of.councillors.in.ward))) %>%
   right_join(wardgrid) 
 
-summaryBiasByWardx <-df %>% 
+summaryBiasByWard <-df %>% 
   select(Borough_code,Borough_name,Ward_code,Ward_name) %>%
   unique() %>%
   right_join(summaryBiasByWard, multiple = "all")
