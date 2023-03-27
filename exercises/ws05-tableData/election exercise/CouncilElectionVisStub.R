@@ -88,16 +88,18 @@ summaryBiasByWard <-df %>%
   unique() %>%
   right_join(summaryBiasByWard, multiple = "all")
 
-# Try a plot below for summaryBiasByWard e.g. with geom_tile() that shows all! data
+# Try a plot below for summaryBiasByWard e.g. with geom_tile() that shows all data. 
+# To avoid overplotting you will need to use facet_grid() e.g. by faceting by position_within and party.  
+# In order to see the small differences in the bias you need to figure out a good diverging colouring scheme, which also takes care of missing (na) values by making them less prominent.
 
-
-
-
-+ scale_fill_gradient2(midpoint = 0,
+ggplot(summaryBiasByWard,aes(x= ???,y= ???,fill=meanBias))+
+  geom_tile()+
+  facet_grid(cols = vars(????),rows = vars(????))+
+  scale_fill_gradient2(midpoint = 0,
                      low = 'green2',
                      mid = 'yellow',
                      high = 'red3',
-                     na.value = 'white')
+                     na.value = 'black')
 
 summaryBiasByBorough <-df %>% 
   group_by(Borough_name,position_within,party) %>%
