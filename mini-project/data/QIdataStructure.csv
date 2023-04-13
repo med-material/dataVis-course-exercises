@@ -1,0 +1,135 @@
+  ,QICategory,QiSubCategory,isKPI,isAngelsCriteria,QIName,QIshortName,referenceDataColumns,attributeType,n_missingEntriesInDB,summarizeBy,isSmallerOrLargerBetterValue,visualizedAsOnNewDashboard,commentsInfo,aggregatedGroupsName,conditionForAggr,isStudProj
+1,PatientOverview,,,,Patient count,,subject_id,Numerical,0,count,,trend,Number of patients in hospital,patient count,total cohort,x
+2,PatientCharacteristics,,,,Age,,age,Numerical,0,median,,trend,Age of patients,median age,total cohort,x
+3,PatientCharacteristics,,,,Gender,,gender,Categorical,0,%,,stacked_bargraph,Gender of patients,gender,total cohort,x
+4,PatientCharacteristics,,,,NIHSS,,nihss_score,Numerical,1765,median,<,trend,severity score,Median NIHSS,total cohort,
+5,PatientCharacteristics,,,,BP systolic,,sys_blood_pressure,Numerical,9884,mean,<,trend,blood pressure contracts and pumps,Median systolic blood pressure,total cohort,
+6,PatientCharacteristics,,,,BP diastolic,,dis_blood_pressure,Numerical,9884,mean,<,trend,blood pressure relaxed,Not found,Not found,
+7,PatientCharacteristics,,,,Glucose,,glucose,Numerical,9885,median,<,trend,glucose (blood sugar),Median glucose,total cohort,
+8,PatientCharacteristics,,,,LDL cholestorol,,cholesterol,Numerical,10091,mean,<,trend,"cholesterol (""fat"" blood)",Median cholesterol,total cohort,
+9,PatientCharacteristics,,x,,mRS,,prestroke_mrs,Numerical,9166,%,<,trend,Score (0 to 6) ranking symptom severity,Median addmision mRS ,total cohort,x
+10,PatientCharacteristics,,,,COVID positive,,covid_test,Categorical_binary,0,%,<,trend,patient has covid,Covid test performed,total cohort,
+11,PatientCharacteristics,,,,Type of stroke,,stroke_type,Categorical,0,%,,stacked_bargraph,"Type of stroke (Ischemic, Hemorrhagic)",Stroke type,total cohort,x
+12,PatientCharacteristics,,,,In-hospital stroke,,hospital_stroke,Categorical_binary,0,%,<,trend,Patient had a stroke while already in hospital,hospital stroke,total cohort,x
+13,PatientCharacteristics,,,,Arrival pre-notified,,prenotification,Categorical_binary,0,%,>,trend,arrival was pre-notified,hospital prenotification by ems,arrival_mode == ems,
+14,PatientCharacteristics,riskFactors,,,Hypertension,,risk_hypertension,Categorical_binary,0,%,<,trend,patient has been diagnosed with this condition previously,risk factor (from patient previous history,total cohort,x
+15,PatientCharacteristics,riskFactors,,,Diabetes,,risk_diabetes,Categorical_binary,0,%,<,trend,patient has been diagnosed with this condition previously,risk factor (from patient previous history,total cohort,x
+16,PatientCharacteristics,riskFactors,,,Hyperlipidemia,,risk_hyperlipidemia,Categorical_binary,0,%,<,trend,patient has been diagnosed with this condition previously,risk factor (from patient previous history,total cohort,x
+17,PatientCharacteristics,riskFactors,,,Active smoker,,risk_smoker,Categorical_binary,0,%,<,trend,Patient actively smokes,risk factor (from patient previous history,total cohort,x
+18,PatientCharacteristics,riskFactors,,,Active smoker last 10 years,,risk_smoker_last_10_years,Categorical_binary,0,%,<,trend,Patient has been smoking for ten years or more,risk factor (from patient previous history,total cohort,x
+19,PatientCharacteristics,riskFactors,,,Previous IS/TIA,,risk_previous_ischemic_stroke,Categorical_binary,0,%,<,trend,Patient had an Ischemic stroke before (stroke cause by blood clot),risk factor (from patient previous history,total cohort,x
+20,PatientCharacteristics,riskFactors,,,Previous ICH,,risk_previous_hemorrhagic_stroke,Categorical_binary,0,%,<,trend,Patient had an hemorrhagic stroke before (stroke cause by bleeding in brain),risk factor (from patient previous history,total cohort,x
+21,PatientCharacteristics,riskFactors,,,Atrial Fib./Flutter,,risk_atrial_fibrilation,Categorical_binary,0,%,<,trend,Fast irregular heart beats,risk factor (from patient previous history,total cohort,x
+22,PatientCharacteristics,riskFactors,,,Cor. Artery Disease / Previous MI,,risk_coronary_artery_disease_or_myocardial_infarction,Categorical_binary,0,%,<,trend,Patient has prior heart disease,risk factor (from patient previous history,total cohort,x
+23,PatientCharacteristics,riskFactors,,,Cong. Heart Fail,,risk_congestive_heart_failure,Categorical_binary,0,%,<,trend,Patient had prior heart failure,risk factor (from patient previous history,total cohort,x
+24,PatientCharacteristics,riskFactors,,,HIV,,risk_hiv,Categorical_binary,0,%,<,trend,Patient has HIV,risk factor (from patient previous history,total cohort,x
+25,PatientCharacteristics,,,,Arrival mode,,arrival_mode,Categorical,0,%,,stacked_bargraph,how patient arrived to hospital,arrival mode to hospital,total cohort,
+26,PatientCharacteristics,,,,First received care,,first_hospital,Categorical,0,%,,stacked_bargraph,Where patient was first hospitalised,first hospital,total cohort,x
+27,PatientCharacteristics,,,,Hospitalized at unit,,hospitalized_in,Categorical,0,%,,stacked_bargraph,In what unit the patient was allocated,hospitalized in dedicated stroke unit,total cohort,
+28,PatientCharacteristics,,,,Hospitalized at department,,department_type,Categorical,0,%,,stacked_bargraph,In what department the patient was allocated,addmission department,total cohort,
+29,PatientCharacteristics,beforeOnset,,,Anti Diabetics,,before_onset_antidiabetics,Categorical_binary,0,%,<,trend,Patient was taking diabetes medication before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+30,PatientCharacteristics,beforeOnset,,,Anti Hypertensives,,before_onset_antihypertensives,Categorical_binary,0,%,<,trend,Patient was taking hypersensitivity medication before strokes,Not found,Not found,x
+31,PatientCharacteristics,beforeOnset,,,Aspirin (ASA),,before_onset_asa,Categorical_binary,0,%,<,trend,Patient was taking Aspiring before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+32,PatientCharacteristics,beforeOnset,,,Cilostazol,,before_onset_cilostazol,Categorical_binary,0,%,<,trend,Patient was taking Cilostazol before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+33,PatientCharacteristics,beforeOnset,,,Clopidogrel,,before_onset_clopidrogel,Categorical_binary,0,%,<,trend,Patient was taking Clopidogrel before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+34,PatientCharacteristics,beforeOnset,,,Ticagrelol,,before_onset_ticagrelor,Categorical_binary,0,%,<,trend,Patient was taking Ticagrelol before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+35,PatientCharacteristics,beforeOnset,,,Ticlopidine,,before_onset_ticlopidine,Categorical_binary,0,%,<,trend,Patient was taking Ticlopidine before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+36,PatientCharacteristics,beforeOnset,,,Prasugrel,,before_onset_prasugrel,Categorical_binary,0,%,<,trend,Patient was taking Prasugrel before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+37,PatientCharacteristics,beforeOnset,,,"Dipyridamol, slow release",,before_onset_dipyridamol,Categorical_binary,0,%,<,trend,Patient was taking Dipyridamol before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+38,PatientCharacteristics,beforeOnset,,,Warfarin,,before_onset_warfarin,Categorical_binary,0,%,<,trend,Patient was taking Warfarin before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+39,PatientCharacteristics,beforeOnset,,,Heparin,,before_onset_heparin,Categorical_binary,0,%,<,trend,Patient was taking Heparin before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+40,PatientCharacteristics,beforeOnset,,,Dabigatran,,before_onset_dabigatran,Categorical_binary,0,%,<,trend,Patient was taking Dabigatran before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+41,PatientCharacteristics,beforeOnset,,,Rivoroxaban,,before_onset_rivaroxaban,Categorical_binary,0,%,<,trend,Patient was taking Rivoroxaban before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+42,PatientCharacteristics,beforeOnset,,,Apixaban,,before_onset_apixaban,Categorical_binary,0,%,<,trend,Patient was taking Apixaban before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+43,PatientCharacteristics,beforeOnset,,,Edoxaban,,before_onset_edoxaban,Categorical_binary,0,%,<,trend,Patient was taking Edoxaban before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+44,PatientCharacteristics,beforeOnset,,,Statin,,before_onset_statin,Categorical_binary,0,%,<,trend,Patient was taking Statin before stroke,Treatment before admission/event,"stroke_type in ['ischemic', 'transient ischemic']",x
+45,PatientCharacteristics,,,,Ischemic stroke etiology,,"etiology_large_artery, etiology_cardioembolism, etiology_other, etiology_cryptogenic_stroke, etiology_small_vessel",Categorical,Not found,%,,stacked_bargraph,What disease was determined,Not found,Not found,
+46,PatientCharacteristics,,,,Stroke mimics,,stroke_mimics_diagnosis,Categorical,0,%,,stacked_bargraph,What the diagnosis mimics,Stroke mimics final diagnosis,stroke_type=='stroke mimics',
+47,Bleeding,,,,ICH volume,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+48,Bleeding,bleedingSource,,,Infratentorial bleeding,,infratentorial_source,Categorical_binary,0,%,<,trend,,Infratentorial source of bleeding,stroke_type=='intracerebral hemorrhage',
+49,Bleeding,bleedingSource,,,Source of bleeding found,,bleeding_source,Categorical_binary,0,%,>,trend,,Source of bleeding found,stroke_type=='intracerebral hemorrhage',
+50,Bleeding,,,,ICH score,,ich_score,Numerical,11628,median,>,trend,,Not found,Not found,
+51,Bleeding,,,,Neurosurgery for ICH,,neurosurgery,Categorical_binary,0,%,>,stacked_bargraph,,Neurosurgery done,stroke_type=='intracerebral hemorrhage' & neurosur,
+52,Bleeding,,,,ICH bleeding cause,,"bleeding_reason_hypertension, bleeding_reason_aneurysm, bleeding_reason_malformation, bleeding_reason_anticoagulant, bleeding_reason_angiopathy, bleeding_reason_other",Categorical,Not found,%,,stacked_bargraph,,Bleeding reason,stroke_type=='intracerebral hemorrhage',
+53,Bleeding,,,,Hunt-Hess,,hunt_hess_score,Categorical,11689,%,,stacked_bargraph,,Hunt Hess score,stroke_type=='subarachnoid hemorrhage' & hunt_hess_score != null,
+54,Imaging,,,,Imaging modality,,imaging_type,Categorical,0,%,,stacked_bargraph,,imaging type,imaging_done == true,
+55,Imaging,,,,Site of occlusion,,"occlusion_left_mca_m1, occlusion_left_mca_m2, occlusion_left_mca_m3, occlusion_left_aca, occlusion_left_pca_p1, cclusion_left_pca_p2,occlusion_left_cae,occlusion_left_cai,occlusion_right_mca_m1,occlusion_right_mca_m2,occlusion_right_mca_m3,occlusion_right_aca,occlusion_right_pca_p1,occlusion_right_pca_p2,occlusion_right_cae,occlusion_right_cai,occlusion_ba,occlusion_va",Categorical,Not found,%,,stacked_bargraph,,Not found,Not found,
+56,Imaging,,x,,Imaging not done at all,,imaging_done,Categorical_binary,0,%,>,trend,If patient underwent imaging to verify stroke,Imaging done,total cohort,x
+57,Imaging,,,,Imaging done but outside your hospital,,imaging_type == 'elsewhere',Categorical_binary,Not found,%,,trend,,Not found,Not found,
+58,Imaging,,x,,Door-to-imaging time,,door_to_imaging,Numerical,9287,median,<,trend,Median time (minutres) to brain scan patients,Median door to imaging,"imaging_done == true & door_to_imaging between <0,400)",x
+59,Imaging,,,,CT perfusion score,,perfusion_score,Numerical,Not found,mean,,trend,,Not found,Not found,
+60,Imaging,,,,CT perfusion hypoperfusion,,hypoperfusion_score,Numerical,Not found,mean,,trend,,Not found,Not found,
+61,Imaging,,,,Carotid arteries imaging within 7 days after admission,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+62,Imaging,,,,Symptomatic carotid stenosis > 70%,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+63,Imaging,,,,Symptomatic carotid stenosis 50-70%,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+64,Imaging,,,,ICH volume,,,Numerical,Not found,mean,,trend,,Not found,Not found,
+65,Treatment,,x,,Number of IVT,,thrombolysis,Categorical_binary,0,count,>,trend,Number of patients receiving Thrombolysis (stroke treatment),Thrombolysis done,stroke_type=='ischemic',x
+66,Treatment,,,,% IVT of all ischemic strokes,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+67,Treatment,,,,Arrival pre-notified,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+68,Treatment,,x,,"Onset-to-door time, median",,onset_to_door,Numerical,2771,median,<,trend,Median time (minutes) between start of stroke until getting to hospital,time from onset of stroke to hospital arrival,total cohort,x
+69,Treatment,,x,,"Door-to-needle for IVT, median",,door_to_needle,Numerical,9392,median,<,trend,Median time (minutes) to treat patient with thrombolysis after arriving at hospital,Median DTN,stroke_type=='ischemic' & thrombolysis == true & hospital_stroke != true & first_hospital == true,x
+70,Treatment,,x,,Number of MT,,thrombectomy,Categorical_binary,0,count,>,trend,Number of patients receiving thrombectomy (stroke treatment),Thrombectomy done,stroke_type=='ischemic',x
+71,Treatment,,,,% MT only of all ischemic strokes,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+72,Treatment,,,,% IVT+MT of all ischemic strokes,,thrombectomy or thrombolysis,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+73,Treatment,,x,,"Door-to-groin for MT, median. Direct (primary transport)",,door_to_groin,Numerical,10348,median,<,trend,Median time (minutes) to treat patient with thrombectomy after arriving at hospital,Median DTG,stroke_type=='ischemic' & thrombectomy == true  & hospital_stroke != true & first_hospital == true,x
+74,Treatment,,x,,"Door-to-groin for MT, median. Drip-and-ship (secondary transport)",,door_to_groin,Numerical,10348,median,<,trend,Median time (minutes) to treat patient with thrombectomy after tranferring from another hospital,Median DTG,stroke_type=='ischemic' & thrombectomy == true  & hospital_stroke != true & first_hospital == true,x
+75,Treatment,,,,TICI scores,,tici_score,Categorical,0,%,,stacked_bargraph,,TICI score,stroke_type=='ischemic' & thrombectomy == true,
+76,Treatment,treatmentComplication,,,Complication after MT,,complications_perforation,Categorical,0,%,,stacked_bargraph,,Procedure complications in thrombectomy,stroke_type=='ischemic' & thrombectomy == true & complication_perforation != null,
+77,Treatment,treatmentComplication,,,Complication after MT,,complications_dissection,Categorical,0,%,,stacked_bargraph,,Procedure complications in thrombectomy,stroke_type=='ischemic' & thrombectomy == true & complications_dissection != null,
+78,Treatment,treatmentComplication,,,Complication after MT,,complications_embolization,Categorical,0,%,,stacked_bargraph,,Procedure complications in thrombectomy,stroke_type=='ischemic' & thrombectomy == true & complications_embolization != null,
+,Treatment,treatmentComplication,,,Complication after MT,,complications_hematoma,Categorical,0,%,,stacked_bargraph,,Procedure complications in thrombectomy,stroke_type=='ischemic' & thrombectomy == true & complications_hematoma != null,
+,Treatment,treatmentComplication,,,Complication after MT,,complications_other,Categorical,0,%,,stacked_bargraph,,Procedure complications in thrombectomy,stroke_type=='ischemic' & thrombectomy == true & complications_other != null,
+,Treatment,treatmentComplication,,,Complication after MT,,complications_none,Categorical,Not found,%,,stacked_bargraph,,Procedure complications in thrombectomy,stroke_type=='ischemic' & thrombectomy == true & complications_none != null,
+77,Treatment,,,,Onset-to-door time distribution in %,,,Categorical,Not found,%,,stacked_bargraph,,Not found,Not found,
+78,Treatment,,,,"Door-to-imaging time, distribution in %",,,Categorical,Not found,%,,stacked_bargraph,,Not found,Not found,
+79,Treatment,,,,"Door-to-needle time for IVT, distribution in %",,,Categorical,Not found,%,,stacked_bargraph,,Not found,Not found,
+80,Treatment,,,,"Door-to-groin time for MT, distribution in %",,,Categorical,Not found,%,,stacked_bargraph,,Not found,Not found,
+81,PatientsAfter3Days,,,,Decompressive hemicraniectomy,,hemicraniectomy,Categorical_binary,0,%,>,trend,,Decompresive craniectomy,post_acute_care == 'yes' & stroke_type == 'ischemic' & hemicraniectomy != null,
+82,PatientsAfter3Days,,,,Carotid artery imaging <= 7 days after admission,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+83,PatientsAfter3Days,,,,>70% internal carotid artery stenosis,,,Categorical_binary,Not found,%,,trend,,Not found,Not found,
+84,PatientsAfter3Days,,,,Carotid endarterectomy of patients with >70% ICA stenosis,,carotid_stenosis_followup,Categorical_binary,0,%,>,trend,,Carotid endarterectomy performed or stenting within two weeks after the stroke,"post_acute_care == 'yes' & stroke_type in ['ischemic', 'transient ischemic'] & carotid_arteries_imaging == true & carotid_stenosis == true",
+85,PatientsAfter3Days,,,,Antipyretic administered for the first elevated temperature ?,,paracetamol,Categorical_binary,0,%,>,trend,,paracetamol addminister for patients with fever,"post_acute_care == 'yes' & stroke_type in ['ischemic', 'transient ischemic', 'intracerebral hemorrhage', 'undetermined'] & fever == true",
+86,PatientsAfter3Days,,,,Was insulin administered for the first elevated glucose (>=10 mmol/L)?,,insulin_administration,Categorical_binary,0,%,>,trend,,insulin administered for the first elevated glucose,"post_acute_care == 'yes' & stroke_type in ['ischemic', 'transient ischemic', 'intracerebral hemorrhage', 'undetermined'] & glucose_level == true",
+87,PatientsAfter3Days,,,,Dysphagia screening performed before given medication/food oraly,,dysphagia_screening_done,Categorical_binary,0,%,>,trend,,swallowing screening,"post_acute_care == 'yes' & stroke_type in ['ischemic', 'transient ischemic', 'intracerebral hemorrhage', 'undetermined']",
+88,PatientsAfter3Days,,,,Physiotherapy initiated <= 72 hours after admission,,physiotherapy_start_within_3days,Categorical_binary,0,%,,trend,,Not found,Not found,
+89,PatientsAfter3Days,,,,Patient examined by occupational therapist,,occup_physiotherapy_received,Categorical_binary,0,%,>,trend,,Patient received ergotherapy,post_acute_care == 'yes' & stroke_type != 'stroke mimics' & occup_physiotherapy_received != null,
+90,PatientsAfter3Days,,,,Who performed swallowing screen,,dysph_assessment_by,Categorical,0,%,,stacked_bargraph,,Not found,Not found,
+91,PatientsAfter3Days,,,,Reasons for not providing IVT,,no_thrombolysis_reason,Categorical,0,%,,stacked_bargraph,,Reason for not doing thrombolysis,stroke_type=='ischemic' & thrombolysis == false ,
+92,PatientsAfter3Days,,,,Atrial fibrillation/flutter,,afib_flutter,Categorical,0,%,,stacked_bargraph,,Atrial fibrillation/flutter (AF),"post_acute_care == 'yes' & stroke_type in ['ischemic', 'transient ischemic']",
+93,PatientsAfter3Days,,x,,Test for dysphagia screen,,dysphagia_screening_type,Categorical,0,%,,stacked_bargraph,Type of test given for dysphagia (swallowing difficulties),swallowing screening test ,"post_acute_care == 'yes' & stroke_type in ['ischemic', 'transient ischemic', 'intracerebral hemorrhage', 'undetermined'] & dysphagia_screening_done == true & dysphagia_screening_test != null",x
+94,PatientsAfter3Days,,,,Reasons for not providing MT,,no_thrombectomy_reason,Categorical,0,%,,stacked_bargraph,Reason for not providing thrombectomy treatment,Reason for not doing thrombectomy,stroke_type=='ischemic' & thrombectomy == false,x
+95,PatientsAfter3Days,,,,Reasons for not providing IVT,,no_thrombolysis_reason,Categorical,0,%,,stacked_bargraph,Reason for not providing thromboloysis treatment,Reason for not doing thrombolysis,stroke_type=='ischemic' & thrombolysis == false ,x
+96,Discharge,discharge,,,Anti Diabetics,,discharge_antidiabetics,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+97,Discharge,discharge,,,Anti Hypertensives,,discharge_antihypertensives,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+98,Discharge,discharge,,,Aspirin (ASA) for ischemic stroke/TIA,,discharge_asa,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+99,Discharge,discharge,,,Cilostazol,,discharge_cilostazol,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+100,Discharge,discharge,,,Clopidogrel,,discharge_clopidrogel,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+101,Discharge,discharge,,,Ticagrelol,,discharge_ticagrelor,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+102,Discharge,discharge,,,Ticlopidine,,discharge_ticlopidine,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+103,Discharge,discharge,,,Prasugrel,,discharge_prasugrel,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+104,Discharge,discharge,,,"Dipyridamol, slow release",,discharge_dipyridamol,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+105,Discharge,discharge,,,Warfarin for AF,,discharge_warfarin,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+106,Discharge,discharge,,,heparin for AF,,discharge_heparin,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+107,Discharge,discharge,,,Dabigatran for AF,,discharge_dabigatran,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+108,Discharge,discharge,,,Rivoroxaban for AF,,discharge_rivaroxaban,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+109,Discharge,discharge,,,Apixaban for AF,,discharge_apixaban,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+110,Discharge,discharge,,,Edoxaban for AF,,discharge_edoxaban,Categorical_binary,0,%,>,trend,,Discharge treatment,discharge_destination != 'dead',
+111,Discharge,discharge,,,Statin for non-cardioembolic ischemic stroke,,discharge_statin,Categorical_binary,0,%,>,trend,,Not found,Not found,
+112,Discharge,discharge,,,Complications,,"complications_perforation, complications_dissection, complications_embolization, complications_hematoma, complications_other, complications_none",Categorical,Not found,%,,stacked_bargraph,,Not found,Not found,
+113,PostAcute,,,,Post acute care,,post_acute_care,Categorical,0,%,,stacked_bargraph,Types of care and treatment given after stroke (e.g. physical rehabilitation),Post-acute care treatment,total cohort,x
+114,Discharge,discharge,,,Discharge destination,,discharge_destination,Categorical,0,%,,stacked_bargraph,Where patients went after hospital (e.g. home),discharge destination,total cohort,x
+115,Discharge,discharge,x,,Modified ranking scale discharge,,discharge_mrs,Categorical,2170,%,,stacked_bargraph,Score on stroke symtpom severity scale when leaving the hospital,Median mRS on discharge,"discharge_destination in ['home', 'social care', 'dead']",x
+116,Discharge,discharge,x,,Modified ranking scale 3 month,,three_m_mrs,Categorical,11151,%,,stacked_bargraph,Score on stroke symtpom severity scale 3 monthes after stroke,Median MRS after 3 months,discharge_destination != 'dead',x
+117,Discharge,discharge,x,,Discharged with antiplatelets,,discharge_any_antiplatelet,Categorical_binary,0,%,>,trend,Amount of patients given antipltlet medication when leaving the hospital,Discharge treatment,discharge_destination != 'dead',x
+118,Discharge,discharge,,,NIHSS discharge,,discharge_nihss_score,Numerical,9507,median,<,trend,,Median NIHSS on discharge,"discharge_destination in ['home', 'social care']",
+119,Discharge,discharge,x,,Discharged with anticoagulants,,discharge_any_anticoagulant,Categorical_binary,0,%,>,trend,Amount of patients given anticoagulant medication when leaving the hospital,Discharge treatment,discharge_destination != 'dead',x
+120,AngelAwards,,,x,Patients treated with door-to-needle time <= 60 minutes,,door_to_needle,Numerical,9392,%,<,,Amount of patients treated with thrombolysis in under 60mins,Median DTN,stroke_type=='ischemic' & thrombolysis == true & hospital_stroke != true & first_hospital == true,x
+121,AngelAwards,,,x,Patients treated with door-to-needle time <= 45 minutes,,door_to_needle,Numerical,9392,%,<,,Amount of patients treated with thrombolysis in under 45mins,Median DTN,stroke_type=='ischemic' & thrombolysis == true & hospital_stroke != true & first_hospital == true,x
+122,AngelAwards,,,x,Patients treated with door-to-groin time <= 120 minutes,,door_to_groin,Numerical,10348,%,<,,Amount of patients treated with thrombectomy in under 120mins,Median DTG,stroke_type=='ischemic' & thrombectomy == true  & hospital_stroke != true & first_hospital == true,x
+123,AngelAwards,,,x,Patients treated with door-to-groin time <= 90 minutes,,door_to_groin,Numerical,10348,%,<,,Amount of patients treated with thrombectomy in under 90mins,Median DTG,stroke_type=='ischemic' & thrombectomy == true  & hospital_stroke != true & first_hospital == true,x
+124,AngelAwards,,,x,Recanalization rate out of total ischemic incidence,,thrombolysis,Numerical,0,%,>,,Ischemic strokes treated with recanalisation (returning blood flow to blocked areas),Thrombolysis done,stroke_type=='ischemic',x
+125,AngelAwards,,,x,Suspected stroke patients undergoing CT/MRI,,imaging_done,Numerical,0,%,>,,Amount of patients brain scanned to verify stroke,Imaging done,total cohort,x
+126,AngelAwards,,,x,Stroke patients undergoing dysphagia screening,,dysphagia_screening_done,Numerical,0,%,>,,amount of patients screened for dysphagia (swallowing difficulties),swallowing screening,"post_acute_care == 'yes' & stroke_type in ['ischemic', 'transient ischemic', 'intracerebral hemorrhage', 'undetermined']",x
+127,AngelAwards,,,x,Ischemic stroke patients discharged with antiplatelets,,discharge_any_antiplatelet,Numerical,0,%,>,,amount of patients with Ischemic stroke given antiplatlet medication,Discharge treatment,discharge_destination != 'dead',x
+128,AngelAwards,,,x,Atrial fibrilation patients discharged with anticoagulants,,discharge_any_anticoagulant,Numerical,0,%,>,,amount of patients given anticouagulant (stops blood clots),Discharge treatment,discharge_destination != 'dead',x
+129,AngelAwards,,,x,Stroke patients hospitalized in a dedicated stroke unit / ICU,,hospitalized_in,Numerical,0,%,>,,amount of patients hospitalised in a dedicated stroke unit,hospitalized in dedicated stroke unit,total cohort,x
