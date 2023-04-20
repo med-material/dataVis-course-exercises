@@ -2,6 +2,7 @@
 library(rstatix)
 library(googlesheets4)
 library(gsheet)
+library(stringr)
 library(tidyverse)
 source("utils/data_structures.R")
 dataset <- tibble::as_tibble(read.csv("data/dataREanonymized.csv"))
@@ -109,13 +110,13 @@ catVars_cols <- c(key_cols, catVars)
 
 # NA conditions for missing data
 angel_conds <- angel_awards %>%
-  select(QI, cond, aggCond, nameOfAggr, isAngelKPI) %>%
+  select(QI, incInAgg, aggCond, nameOfAggr, isAngelKPI) %>%
   unique() #%>%
-  # mutate(QI=nameOfAggr)
+# mutate(QI=nameOfAggr)
 
 # is this needed? HK
 # agg_conds <- angel_conds %>%
-#   select(QI, cond, aggCond) %>%
+#   select(QI, incInAgg, aggCond) %>%
 #   unique() %>%
 #   mutate(nameOfAggr = QI)
 # ? is rbind part of pipe?
@@ -126,53 +127,59 @@ eval_vec <- Vectorize(eval.parent, vectorize.args = "expr")
 # merge data with conditions and derive variables -> takes a few minutes e.g. 3 minutes
 
 numKPIcols <- c('door_to_needle','door_to_groin')
-charKPIcols <- c('thrombolysis','imaging_done','discharge_any_antiplatelet','discharge_any_anticoagulant')
+charKPIcols <- c('thrombolysis','imaging_done','discharge_any_antiplatelet','discharge_any_anticoagulant','dysphagia_screening_type', 'hospitalized_in')
+doubleDutyCols <- c('imaging_done_dup','thrombolysis_dup','hospitalized_in_dup') 
 # we're missing 'dysphagia_screening_type' and 'hospitalized_in' there's some problem with the eval statement'
 
-df <- dataset[, unique(c(key_cols,charKPIcols, ctrl_cols, Agg_cond_cols))] %>% 
+# ---- prepare all categorical KPIs for aggregation
+df <- dataset[,] %>%
+  select(all_of(unique(c(key_cols,charKPIcols, ctrl_cols, Agg_cond_cols,cond_cols)))) %>% 
   mutate_if(is.logical, as.character) %>%
-  pivot_longer(-c(key_cols, ctrl_cols, Agg_cond_cols), names_to = "QI", values_to = "Value") %>%
+  mutate(imaging_done_dup = imaging_done,
+         thrombolysis_dup=thrombolysis,
+         hospitalized_in_dup = hospitalized_in) %>% 
+  pivot_longer(-c(key_cols, ctrl_cols, Agg_cond_cols,cond_cols), names_to = "QI", values_to = "Value") %>%
+  mutate(QI = str_replace(QI, "imaging_done_dup", "imaging_done"),
+         QI = str_replace(QI, "thrombolysis_dup", "thrombolysis"),
+         QI = str_replace(QI, "hospitalized_in_dup", "hospitalized_in")) %>%
+  left_join(angel_conds, multiple = "all") %>%
+  filter(!is.na(isAngelKPI)) %>% 
+  mutate(#allConds=strsplit(incInAgg, "&"),
+    qual4agg = NA,
+    qual4agg = ifelse(QI!="hospitalized_in",qual4agg, TRUE),
+    qual4agg = ifelse(QI!="imaging_done",qual4agg, ifelse(first_hospital==TRUE,TRUE,FALSE)),
+    qual4agg = ifelse(QI!="thrombolysis",qual4agg, ifelse(stroke_type=='ischemic',TRUE,FALSE)),
+    qual4agg = ifelse(QI!="dysphagia_screening_type",qual4agg, ifelse(post_acute_care == 'yes' & stroke_type %in% c('ischemic','transient ischemic','intracerebral hemorrhage', 'undetermined'),TRUE,FALSE)),
+    qual4agg = ifelse(QI!="discharge_any_antiplatelet",qual4agg,ifelse(discharge_destination!='dead',TRUE,FALSE)),
+    qual4agg = ifelse(QI!="discharge_any_anticoagulant",qual4agg,ifelse(discharge_destination!='dead',TRUE,FALSE)),
+    isMissingData = ifelse(!is.na(Value), 0, ifelse(!qual4agg,0,1 )),
+    aggFunc = ifelse(isAngelKPI, "pct", "median"), 
+    evaltext=sprintf("'%s' %s", Value, aggCond),
+    evalVecTF=eval_vec(parse(text = evaltext)),
+    Val2agg = ifelse(!qual4agg, NA, 
+                     ifelse(isAngelKPI == FALSE, Value,
+                            ifelse(evalVecTF,1,0)))) 
+
+# ---- prepare all numerical KPIs for aggregation
+df <- 
+  dataset[, unique(c(key_cols,numKPIcols, ctrl_cols, Agg_cond_cols,cond_cols))] %>% 
+  mutate_if(is.logical, as.character) %>%
+  pivot_longer(-c(key_cols, ctrl_cols, Agg_cond_cols,cond_cols), names_to = "QI", values_to = "Value") %>%
   left_join(angel_conds, multiple = "all") %>%
   filter(!is.na(isAngelKPI)) %>%
-  mutate(
-    Val2agg = ifelse(eval(parse(text = cond)),
-      ifelse(isAngelKPI == FALSE,
-        Value,
-        ifelse(eval_vec(parse(text = paste(Value, aggCond))),
-               # eval_vec(parse(text=sprintf("'%s' %s", Value, aggCond)))
-          1, 0
-        )
-      ),
-      NA
-    ),
-    isMissingData = ifelse(is.na(Value) & eval(parse(text = cond)), 1, 0),
-    aggFunc = ifelse(isAngelKPI, "pct", "median")
-  )
+  mutate(qual4agg = NA,
+         qual4agg = ifelse(QI!="door_to_needle",qual4agg, ifelse(stroke_type=='ischemic' & thrombolysis == TRUE & hospital_stroke != TRUE & first_hospital == TRUE, TRUE,FALSE)),
+         qual4agg = ifelse(QI!="door_to_groin",qual4agg, ifelse(stroke_type=='ischemic' & thrombectomy == TRUE & hospital_stroke != TRUE & first_hospital == TRUE, TRUE,FALSE)),         
+         # qual4agg = Reduce(`&`, lapply(allConds, function(x) eval(parse(text = x), envir = .))),  
+         isMissingData = ifelse(!is.na(Value), 0, ifelse(!qual4agg,0,1 )),
+         aggFunc = ifelse(isAngelKPI, "pct", "median"), 
+         evaltext=sprintf("'%s' %s", Value, aggCond),
+         evalVecTF=eval_vec(parse(text = evaltext)),
+         Val2agg = ifelse(!qual4agg, NA, 
+                          ifelse(isAngelKPI == FALSE, Value,
+                                 ifelse(evalVecTF,1,0))))%>%
+  rbind(df)
 
-df <- dataset[, unique(c(key_cols,numKPIcols, ctrl_cols, Agg_cond_cols))] %>% 
-  mutate_if(is.logical, as.character) %>%
-  pivot_longer(-c(key_cols, ctrl_cols, Agg_cond_cols), names_to = "QI", values_to = "Value") %>%
-  left_join(angel_conds, multiple = "all") %>%
-  filter(!is.na(isAngelKPI)) %>%
-  mutate(
-    Val2agg = ifelse(eval(parse(text = cond)),
-                     ifelse(isAngelKPI == FALSE,
-                            Value,
-                            ifelse(eval_vec(parse(text = paste(Value, aggCond))),
-                                   1, 0
-                            )
-                     ),
-                     NA
-    ),
-    isMissingData = ifelse(is.na(Value) & eval(parse(text = cond)), 1, 0),
-    aggFunc = ifelse(isAngelKPI, "pct", "median")
-  ) %>% rbind(df)
-
-
-
-# 
-# # convert all columns used for subgroup analysis to character
-# df[, subgroupVars] <- lapply(df[, subgroupVars], as.character)
 
 # aggregation -------------------------------------------------------------
 # create quarterly hospital aggregates of numVars
@@ -180,8 +187,8 @@ agg_dataNum <- df %>%
   group_by(QI, nameOfAggr, h_country, h_name, year, quarter, YQ, isAngelKPI, aggFunc) %>%
   summarise(
     Value = ifelse(first(isAngelKPI) == FALSE,
-      median(Val2agg, na.rm = TRUE),
-      ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+                   median(Val2agg, na.rm = TRUE),
+                   ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
     ),
     data_Pts = sum(!is.na(Val2agg)),
     data_missing = sum(isMissingData)
@@ -197,14 +204,15 @@ agg_dataNum <- df %>%
 # function_name <- function(arg_1, arg_2, ...) {
 # Function body
 # }
+
 addYearlyHospAggregates <- function(df, angel_conds, agg_dataNum) {
   agg_dataNum <- df %>%
     left_join(angel_conds) %>%
     group_by(QI, nameOfAggr, h_country, h_name, year, isAngelKPI, aggFunc) %>%
     summarise(
       Value = ifelse(first(isAngelKPI) == FALSE,
-        median(Val2agg, na.rm = TRUE),
-        ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+                     median(Val2agg, na.rm = TRUE),
+                     ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
       ),
       data_Pts = sum(!is.na(Val2agg)),
       data_missing = sum(isMissingData)
@@ -219,14 +227,14 @@ addYearlyHospAggregates <- function(df, angel_conds, agg_dataNum) {
 
 agg_dataNum <- addYearlyHospAggregates(df, angel_conds, agg_dataNum)
 
-# add quarterly country aggregates of numVars
+# ---- add quarterly country aggregates of numVars
 agg_dataNum <- df %>%
   left_join(angel_conds) %>%
   group_by(QI, nameOfAggr, h_country, year, quarter, isAngelKPI, aggFunc) %>%
   summarise(
     Value = ifelse(first(isAngelKPI) == FALSE,
-      median(Val2agg, na.rm = TRUE),
-      ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+                   median(Val2agg, na.rm = TRUE),
+                   ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
     ),
     data_Pts = sum(!is.na(Val2agg)),
     data_missing = sum(isMissingData)
@@ -237,14 +245,14 @@ agg_dataNum <- df %>%
   ) %>%
   rbind(agg_dataNum)
 
-# add yearly country aggregates of numVars
+# ---- add yearly country aggregates of numVars
 agg_dataNum <- df %>%
   left_join(angel_conds) %>%
   group_by(QI, nameOfAggr, h_country, year, isAngelKPI, aggFunc) %>%
   summarise(
     Value = ifelse(first(isAngelKPI) == FALSE,
-      median(Val2agg, na.rm = TRUE),
-      ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+                   median(Val2agg, na.rm = TRUE),
+                   ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
     ),
     data_Pts = sum(!is.na(Val2agg)),
     data_missing = sum(isMissingData)
@@ -267,15 +275,14 @@ agg_dataNum <- agg_dataNum %>%
 
 # sub-analysis function --------------------------------------------------
 
-
 createAggs <- function(df, colName) {
   # add quarterly hospital aggregates of numVars
   agg_data <- df %>%
     group_by(QI, nameOfAggr, h_country, h_name, year, quarter, YQ, isAngelKPI, aggFunc, !!sym(colName)) %>%
     summarise(
       Value = ifelse(first(isAngelKPI) == FALSE,
-        median(Val2agg, na.rm = TRUE),
-        ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+                     median(Val2agg, na.rm = TRUE),
+                     ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
       ),
       # eff_size = kruskal_effsize(Val2agg ~ !!sym(colName)),
       data_Pts = sum(!is.na(Val2agg)),
@@ -283,16 +290,16 @@ createAggs <- function(df, colName) {
     ) %>%
     rename(subGroupVal = colName) %>%
     mutate(subGroup = colName)
-
+  
   # add yearly hospital aggregates of numVars
   agg_data <- df %>%
     left_join(angel_conds) %>%
     group_by(QI, nameOfAggr, h_country, h_name, year, isAngelKPI, aggFunc, !!sym(colName)) %>%
     summarise(
       Value = ifelse(first(isAngelKPI) == FALSE,
-        median(Val2agg, na.rm = TRUE),
-        ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
-        # eff_size = kruskal_effsize(Val2agg ~ !!sym(colName)),
+                     median(Val2agg, na.rm = TRUE),
+                     ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+                     # eff_size = kruskal_effsize(Val2agg ~ !!sym(colName)),
       ),
       data_Pts = sum(!is.na(Val2agg)),
       data_missing = sum(isMissingData)
@@ -304,15 +311,15 @@ createAggs <- function(df, colName) {
     rename(subGroupVal = colName) %>%
     mutate(subGroup = colName) %>%
     rbind(agg_data)
-
+  
   # add quarterly country aggregates of numVars
   agg_data <- df %>%
     left_join(angel_conds) %>%
     group_by(QI, nameOfAggr, h_country, year, quarter, isAngelKPI, aggFunc, !!sym(colName)) %>%
     summarise(
       Value = ifelse(first(isAngelKPI) == FALSE,
-        median(Val2agg, na.rm = TRUE),
-        ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))#,
+                     median(Val2agg, na.rm = TRUE),
+                     ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))#,
       ),
       # SD_value = sd(Val2agg, na.rm = TRUE)
       data_Pts = sum(!is.na(Val2agg)),
@@ -325,15 +332,15 @@ createAggs <- function(df, colName) {
     rename(subGroupVal = colName) %>%
     mutate(subGroup = colName) %>%
     rbind(agg_data)
-
+  
   # add yearly country aggregates of numVars
   agg_data <- df %>%
     left_join(angel_conds) %>%
     group_by(QI, nameOfAggr, h_country, year, isAngelKPI, aggFunc, !!sym(colName)) %>%
     summarise(
       Value = ifelse(first(isAngelKPI) == FALSE,
-        median(Val2agg, na.rm = TRUE),
-        ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+                     median(Val2agg, na.rm = TRUE),
+                     ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
       ),
       # SD_value = sd(Val2agg, na.rm = TRUE),
       # median = median(Value, na.rm = TRUE),
@@ -348,21 +355,19 @@ createAggs <- function(df, colName) {
     rename(subGroupVal = colName) %>%
     mutate(subGroup = colName) %>%
     rbind(agg_data)
-
+  
   agg_data <- agg_data %>%
     mutate(
       isKPI = ifelse(QI %in% KPIs, TRUE, FALSE),
       pct_missing = ifelse(data_Pts == 0, 0, round(data_missing / (data_missing + data_Pts) * 100, 1))
     )
-
+  
   return(agg_data)
 }
 
 createAggsLapply <- function(df, vars) {
   lapply(vars, function(v) createAggs(df, v))
 }
-
-
 
 # add aggregates for all subgroup variables
 agg_dataNum <- rbind(agg_dataNum, do.call(rbind, createAggsLapply(df, subgroupVars)))
@@ -380,7 +385,7 @@ agg_dataNum <- rbind(agg_dataNum, do.call(rbind, createAggsLapply(df, subgroupVa
 # set up the grid so we know all the data that should exist and might be missing from the aggregates
 timeGrid <- as_tibble(unique(agg_dataNum[, c("year", "quarter")]))
 hospitalGrid <- as_tibble(unique(agg_dataNum[, c("h_country", "h_name")]))
-NumMeasureGrid <- as_tibble(unique(agg_dataNum[, c("QI")]))
+NumMeasureGrid <- as_tibble(unique(agg_dataNum[, c("nameOfAggr")]))
 # NumMeasureGrid<-as_tibble(unique(agg_dataNum[,c('QI','agg_function')]))
 full.grid <- timeGrid %>%
   merge(hospitalGrid) %>%
@@ -447,6 +452,75 @@ agg_dataNum <- agg_dataNum %>%
     is1stPlat = ifelse(CSoAbovePlatinum == 1 & qual4Platinum == 1, 1, 0),
     is1stDiam = ifelse(CSoAboveDiamond == 1 & qual4Diamond == 1, 1, 0),
   )
+
+# add the changes in QI from previous quarter holding data
+agg_dataNum <- 
+  agg_dataNum %>%
+  filter(!isYearAgg,!is.na(Value)) %>% 
+  arrange(h_country, h_name, nameOfAggr, subGroup, subGroupVal, YQ) %>%
+  dplyr::group_by(h_country, h_name,  nameOfAggr, subGroup, subGroupVal)  %>% 
+  mutate(diffFromPrevQwithData = Value - lag(Value,default = NA))%>%
+  select(h_country, h_name,nameOfAggr,subGroup, subGroupVal, YQ,Value, diffFromPrevQwithData) %>%
+  right_join(agg_dataNum)
+
+# add the changes in QI from the same quarter year to year  (if no data available go back until you find some holding data)
+agg_dataNum <- 
+  agg_dataNum %>%
+  filter(!isYearAgg,!is.na(Value)) %>% 
+  arrange(h_country, h_name, nameOfAggr, subGroup, subGroupVal, quarter, year) %>%
+  dplyr::group_by(h_country, h_name,  nameOfAggr, subGroup, subGroupVal, quarter)  %>% 
+  mutate(diffFromQprevYearwithData = Value - lag(Value,default = NA))%>%
+  select(h_country, h_name,nameOfAggr,subGroup, subGroupVal, quarter, year, Value, diffFromQprevYearwithData) %>%
+  right_join(agg_dataNum)
+
+agg_dataNum <- 
+  agg_dataNum %>%
+  left_join(angel_awards[,c("nameOfAggr","isBetter")]) %>%
+  mutate(
+    isAsGoodOrBetterThanCountry=eval_vec(parse(text = sprintf("%s %s %s", Value, isBetter, C_Value))),
+    isAsGoodOrBetterThanLastYearSameQuarter=eval_vec(parse(text = sprintf("%s %s %s", diffFromQprevYearwithData, isBetter, "0" ))),
+    isAsGoodOrBetterThanLastQuarter=eval_vec(parse(text = sprintf("%s %s %s", diffFromPrevQwithData, isBetter, "0")))
+  ) 
+
+agg_dataNum <- 
+  agg_dataNum %>%
+  select(h_country,
+         h_name,
+         isCountryAgg,
+         nameOfAggr,
+         QI,
+         isKPI,
+         isAngelKPI,
+         subGroup,
+         subGroupVal,
+         quarter,
+         isYearAgg,
+         year,
+         YQ,
+         aggFunc,
+         Value,
+         data_Pts,
+         data_missing,
+         pct_missing,
+         isBetter,
+         isAsGoodOrBetterThanLastYearSameQuarter,
+         isAsGoodOrBetterThanLastQuarter,
+         isAsGoodOrBetterThanCountry,
+         C_Value,
+         diffFromC,
+         is1stgeqC,
+         CSoAboveCountry,
+         qual4Gold,
+         is1stGold,
+         CSoAboveGold,
+         qual4Platinum,
+         is1stPlat,
+         CSoAbovePlatinum,
+         qual4Diamond,
+         is1stDiam,
+         CSoAboveDiamond
+  )
+
 
 options("scipen" = 999)
 
