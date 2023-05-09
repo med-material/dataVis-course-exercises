@@ -190,6 +190,7 @@ agg_dataNum <- df %>%
                    median(Val2agg, na.rm = TRUE),
                    ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
     ),
+    sd = sd(Val2agg, na.rm = TRUE),
     data_Pts = sum(!is.na(Val2agg)),
     data_missing = sum(isMissingData)
   )
@@ -214,6 +215,7 @@ addYearlyHospAggregates <- function(df, angel_conds, agg_dataNum) {
                      median(Val2agg, na.rm = TRUE),
                      ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
       ),
+      sd = sd(Val2agg, na.rm = TRUE),
       data_Pts = sum(!is.na(Val2agg)),
       data_missing = sum(isMissingData)
     ) %>%
@@ -236,6 +238,7 @@ agg_dataNum <- df %>%
                    median(Val2agg, na.rm = TRUE),
                    ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
     ),
+    sd = sd(Val2agg, na.rm = TRUE),
     data_Pts = sum(!is.na(Val2agg)),
     data_missing = sum(isMissingData)
   ) %>%
@@ -254,6 +257,7 @@ agg_dataNum <- df %>%
                    median(Val2agg, na.rm = TRUE),
                    ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
     ),
+    sd = sd(Val2agg, na.rm = TRUE),
     data_Pts = sum(!is.na(Val2agg)),
     data_missing = sum(isMissingData)
   ) %>%
@@ -273,23 +277,41 @@ agg_dataNum <- agg_dataNum %>%
     subGroup = NA
   )
 
+# function to return p-values and eta-squared for summarizing sub-group variable values
+calc_eta_sq_pval <- function(df, var1, var2) {
+  lm_res <- tryCatch(lm(paste(var1, "~", var2, collapse = " "), data = df),
+                     error = function(e) NULL)
+  if (is.null(lm_res)) {
+    eta_sq <- NA
+    p_val <- NA
+  } else {
+    ss_total <- sum((df[[var1]] - mean(df[[var1]]))^2)
+    ss_residual <- sum(lm_res$residuals^2)
+    eta_sq <- 1 - ss_residual/ss_total
+    p_val <- summary(lm_res)$coefficients[2, 4]
+  }
+  list(eta_sq = eta_sq, p_val = p_val)
+}
+
 # sub-analysis function --------------------------------------------------
 
 createAggs <- function(df, colName) {
   # add quarterly hospital aggregates of numVars
   agg_data <- df %>%
-    group_by(QI, nameOfAggr, h_country, h_name, year, quarter, YQ, isAngelKPI, aggFunc, !!sym(colName)) %>%
-    summarise(
-      Value = ifelse(first(isAngelKPI) == FALSE,
-                     median(Val2agg, na.rm = TRUE),
-                     ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
-      ),
-      # eff_size = kruskal_effsize(Val2agg ~ !!sym(colName)),
-      data_Pts = sum(!is.na(Val2agg)),
-      data_missing = sum(isMissingData)
-    ) %>%
-    rename(subGroupVal = colName) %>%
-    mutate(subGroup = colName)
+   group_by(QI, nameOfAggr, h_country, h_name, year, quarter, YQ, isAngelKPI, aggFunc, !!sym(colName)) %>%
+   summarise(
+     Value = ifelse(first(isAngelKPI) == FALSE,
+       median(Val2agg, na.rm = TRUE),
+       ifelse(is.nan(mean(Val2agg, na.rm = TRUE)), NA, round(mean(Val2agg, na.rm = TRUE) * 100, 1))
+     ),
+     # eta_sq_p_val = list(calc_eta_sq_pval(., var1 = Val2agg, var2 = colName)),
+     data_Pts = sum(!is.na(Val2agg)),
+     data_missing = sum(isMissingData),
+     sd = sd(Val2agg, na.rm = TRUE)
+   ) %>%
+   # unnest(eta_sq_p_val) %>%
+   rename(subGroupVal = colName) %>%
+   mutate(subGroup = colName)
   
   # add yearly hospital aggregates of numVars
   agg_data <- df %>%
@@ -302,7 +324,8 @@ createAggs <- function(df, colName) {
                      # eff_size = kruskal_effsize(Val2agg ~ !!sym(colName)),
       ),
       data_Pts = sum(!is.na(Val2agg)),
-      data_missing = sum(isMissingData)
+      data_missing = sum(isMissingData),
+      sd = sd(Val2agg, na.rm = TRUE)
     ) %>%
     mutate(
       quarter = "all",
@@ -323,7 +346,8 @@ createAggs <- function(df, colName) {
       ),
       # SD_value = sd(Val2agg, na.rm = TRUE)
       data_Pts = sum(!is.na(Val2agg)),
-      data_missing = sum(isMissingData)
+      data_missing = sum(isMissingData),
+      sd = sd(Val2agg, na.rm = TRUE)
     ) %>%
     mutate(
       h_name = "all",
@@ -345,7 +369,8 @@ createAggs <- function(df, colName) {
       # SD_value = sd(Val2agg, na.rm = TRUE),
       # median = median(Value, na.rm = TRUE),
       data_Pts = sum(!is.na(Val2agg)),
-      data_missing = sum(isMissingData)
+      data_missing = sum(isMissingData),
+      sd = sd(Val2agg, na.rm = TRUE)
     ) %>%
     mutate(
       quarter = "all",
@@ -482,6 +507,24 @@ agg_dataNum <-
     isAsGoodOrBetterThanLastQuarter=eval_vec(parse(text = sprintf("%s %s %s", diffFromPrevQwithData, isBetter, "0")))
   ) 
 
+agg_DataAcrossSubGroups <- agg_dataNum %>%
+  filter(aggFunc=="median") %>%
+  dplyr::group_by(QI, nameOfAggr, h_country, h_name, year, quarter, YQ, isAngelKPI, aggFunc,subGroup) %>%
+  dplyr::summarize(SubGroupRange=ifelse(all(is.na(Value)),NA, max(Value,na.rm=TRUE)-min(Value,na.rm=TRUE))) %>%
+  dplyr::rename(subGroupForRange=subGroup) 
+
+agg_dataNum<-agg_dataNum %>% 
+  filter(is.na(subGroup),aggFunc=="median") %>%
+  right_join(agg_DataAcrossSubGroups,multiple = "all") %>% 
+  mutate(subGrpRangeInSDs = ifelse(is.na(sd) | is.na(SubGroupRange),NA,
+                                   ifelse(SubGroupRange==0,0,
+                                          ifelse(sd==0, 10 ,SubGroupRange/sd)))) %>% filter(!is.na(Value)) %>% 
+  rbind(agg_dataNum) %>%
+  arrange(h_country, h_name, nameOfAggr, subGroup, subGroupVal, YQ) 
+
+agg_dataNum <- agg_dataNum %>% mutate(subGroup = ifelse(is.na(subGroupForRange),subGroup,subGroupForRange))
+
+
 agg_dataNum <- 
   agg_dataNum %>%
   select(h_country,
@@ -493,12 +536,15 @@ agg_dataNum <-
          isAngelKPI,
          subGroup,
          subGroupVal,
+         subGroupForRange,
+         subGrpRangeInSDs,
          quarter,
          isYearAgg,
          year,
          YQ,
          aggFunc,
          Value,
+         sd,
          data_Pts,
          data_missing,
          pct_missing,
