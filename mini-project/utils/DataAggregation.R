@@ -516,13 +516,17 @@ agg_DataAcrossSubGroups <- agg_dataNum %>%
 agg_dataNum<-agg_dataNum %>% 
   filter(is.na(subGroup),aggFunc=="median") %>%
   right_join(agg_DataAcrossSubGroups,multiple = "all") %>% 
-  mutate(subGrpRangeInSDs = ifelse(is.na(sd) | is.na(SubGroupRange),NA,
+  mutate(sd = ifelse(aggFunc=="pct",NA,sd),
+    subGrpRangeInSDs = ifelse(is.na(sd) | is.na(SubGroupRange),NA,
                                    ifelse(SubGroupRange==0,0,
                                           ifelse(sd==0, 10 ,SubGroupRange/sd)))) %>% filter(!is.na(Value)) %>% 
   rbind(agg_dataNum) %>%
   arrange(h_country, h_name, nameOfAggr, subGroup, subGroupVal, YQ) 
 
-agg_dataNum <- agg_dataNum %>% mutate(subGroup = ifelse(is.na(subGroupForRange),subGroup,subGroupForRange))
+agg_dataNum <- agg_dataNum %>% 
+  mutate(sd = ifelse(aggFunc=="pct",NA,sd),
+    subGroup = ifelse(is.na(subGroupForRange),subGroup,subGroupForRange))
+
 
 
 agg_dataNum <- 
@@ -536,8 +540,6 @@ agg_dataNum <-
          isAngelKPI,
          subGroup,
          subGroupVal,
-         subGroupForRange,
-         subGrpRangeInSDs,
          quarter,
          isYearAgg,
          year,
@@ -548,6 +550,8 @@ agg_dataNum <-
          data_Pts,
          data_missing,
          pct_missing,
+         subGroupForRange,
+         subGrpRangeInSDs,
          isBetter,
          isAsGoodOrBetterThanLastYearSameQuarter,
          isAsGoodOrBetterThanLastQuarter,
