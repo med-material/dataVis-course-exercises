@@ -1,7 +1,6 @@
 #execute these lines of code  
-#Get the directory of the current script
+#Get the directory of the current script to get through the first three commands from the tutorial
 script_path <- normalizePath("startingPointForMergeAndJoin.R")
-
 # Set the working directory to the script's directory
 setwd(dirname(script_path))
 
