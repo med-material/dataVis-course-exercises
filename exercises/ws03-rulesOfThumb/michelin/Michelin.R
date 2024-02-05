@@ -1,7 +1,8 @@
 install.packages("esquisse")
 library(here)
 library(tidyverse)
-michelinStars<-read.csv(here("exercises","ws02","MichelinStars.csv"))
+michelinStars<-read.csv(here("exercises","ws03-rulesOfThumb","michelin","MichelinStars.csv"))
+
 esquisse::esquisser()
 
 
