@@ -1,14 +1,15 @@
-#execute these lines of code  
+#execute these lines of code
 #Get the directory of the current script to get through the first three commands from the tutorial
-script_path <- normalizePath("startingPointForMergeAndJoin.R")
-# Set the working directory to the script's directory
-setwd(dirname(script_path))
-
+script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(script_path)
+# the first three commands are pasted here for convenience
 unzip("673598238_T_ONTIME_REPORTING.zip")
 mydf <- read.csv("673598238_T_ONTIME_REPORTING.csv", 
                  sep = ",", quote="\"")
 mylookup <- read.csv("L_UNIQUE_CARRIERS.csv_", 
                      quote="\"", sep = "," )
 
-#Now use the code from the example/tutorial below
+#Now use the code from the example/tutorial from here onwards.
+
+
 
