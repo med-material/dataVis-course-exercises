@@ -9,14 +9,16 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(here)
 library(tidyverse)
 library(roll)
 library(magrittr)
+script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(script_path)
+setwd("data")
 # import data frames COVID: cases, tests and population size of municipalities
-dc <- read_delim(here("exercises", "ws00 data wrangling", "covid","data", "Municipality_cases_time_series.csv"), ";", escape_double = FALSE, trim_ws = TRUE)
-dt <- read_delim(here("exercises", "ws00 data wrangling", "covid","data", "Municipality_tested_persons_time_series.csv"), ";", escape_double = FALSE, trim_ws = TRUE)
-dsize <- read_delim(here("exercises", "ws00 data wrangling", "covid","data", "Municipality_test_pos.csv"), ";", escape_double = FALSE, trim_ws = TRUE)
+dc <- read_delim("Municipality_cases_time_series.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+dt <- read_delim("Municipality_tested_persons_time_series.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+dsize <- read_delim("Municipality_test_pos.csv", ";", escape_double = FALSE, trim_ws = TRUE)
 ```
 ## Covid data analysis DK overview
 ```{r dataFramesGlimpse , include=TRUE}
@@ -106,12 +108,13 @@ dt <- dt %>%
          tr7dP100kCh7 = tr7dP100k - lag(tr7dP100k,7)
          )
 dt
-df <- merge(dc, dt)
+
 ```
 
 ```{r Merge}
 # merge test with case data (on shared keys - date_sample+kommune)
 #create test positive variables 
+df <- as_tibble(merge(dc, dt))
 df <- df %>% 
   mutate(
     PosTestRateOnDay = dcr100k / tr100k,
