@@ -22,9 +22,10 @@ timetemplate <- plot_ly() %>%
 vistemplate <- plot_ly() %>%
     config(scrollZoom = TRUE, displaylogo = FALSE, modeBarButtonsToRemove = c("select2d","hoverCompareCartesian", "toggleSpikelines","zoom2d","toImage", "sendDataToCloud", "editInChartStudio", "lasso2d", "drawclosedpath", "drawopenpath", "drawline", "drawcircle", "eraseshape", "autoScale2d", "hoverClosestCartesian","toggleHover")) %>%
     layout(dragmode = "pan", showlegend=FALSE)
-
+script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(script_path)
 ## Read the fake csv data set about ice cream
-D_event<-read.csv(here("evalLog_2020-05-13 15-38-26.2363.csv"), na.string="NULL")
+D_event<-read.csv("evalLog_2020-05-13 15-38-26.2363.csv", na.string="NULL")
 D_event <- D_event %>% mutate(TimeStamp = as.POSIXct(TimeStamp, format = "%Y-%m-%d %H:%M:%OS"))
 D_event$rowID <- 1:nrow(D_event)
 
@@ -36,7 +37,7 @@ D_event <- D_event %>%
            labelpos = ifelse(D_event$EventType == "ModifierEvent", 0.4, labelpos))
 
 Wall_moles <- expand.grid(0:D_event$WallColumnCount[1], 0:D_event$WallRowCount[1]) %>%
-    rename(x = Var1, y = Var2)
+    dplyr::rename(x = Var1, y = Var2)
 
 ## Create the shiny UI layout
 ui <- fluidPage(
