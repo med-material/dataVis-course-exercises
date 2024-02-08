@@ -1,4 +1,6 @@
 library(tidyverse)
+script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(script_path)
 letters <- read_csv("data/correspondence-data-1585.csv")
 
 sources <- letters %>%
