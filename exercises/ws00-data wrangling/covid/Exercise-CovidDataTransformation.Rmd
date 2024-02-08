@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(roll)
 library(magrittr)
+#set the working directory to where the data files are located
 script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(script_path)
 setwd("data")
