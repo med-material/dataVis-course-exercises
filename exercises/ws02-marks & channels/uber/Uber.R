@@ -1,6 +1,7 @@
-library(here)
 library(tidyverse)
-tu<- read_table(here("exercises", "ws02-marks & channels", "uber", "nyuber.dat.csv"))
+script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(script_path)
+tu<- read_table("nyuber.dat.csv")
 ggplot(tu, aes(x = uber, y = taxi)) +
   geom_point(aes(size = rides)) +
   geom_abline(slope = -1, linetype = 2) +
