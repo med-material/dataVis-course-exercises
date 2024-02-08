@@ -9,7 +9,8 @@ mydf <- read.csv("673598238_T_ONTIME_REPORTING.csv",
 mylookup <- read.csv("L_UNIQUE_CARRIERS.csv_", 
                      quote="\"", sep = "," )
 
-#Now use the code from the example/tutorial from here onwards.
+# from here onward  use the code from the example/tutorial 
+# 
 
 
 
