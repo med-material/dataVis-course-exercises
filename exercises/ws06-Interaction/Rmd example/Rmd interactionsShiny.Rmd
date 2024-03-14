@@ -1,0 +1,34 @@
+---
+title: "Interactive Widget Example"
+output: html_document
+runtime: shiny
+---
+
+```{r}
+# Define UI for application
+ui <- fluidPage(
+  titlePanel("Interactive Widget Example"),
+  sliderInput("slider", "Slider:", min = 0, max = 100, value = 50),
+  textOutput("sliderValue")
+)
+
+# Define server logic
+server <- function(input, output) {
+  output$sliderValue <- renderText({
+    paste("Current value:", input$slider)
+  })
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+
+```
+
+In this R Markdown example:
+
+1. We specify `runtime: shiny` in the YAML front matter to indicate that we're using Shiny for dynamic content.
+2. We define the UI using `fluidPage()` and `sliderInput()` to create a slider widget.
+3. We define server logic using `server()`, where we render the current value of the slider using `renderText()` and `textOutput()`.
+4. We create a Shiny app object using `shinyApp()` to combine the UI and server logic.
+
+When you render this R Markdown document to HTML, it will generate a Shiny app that includes an interactive slider widget. As you move the slider, the displayed text will update dynamically to show the current value.
