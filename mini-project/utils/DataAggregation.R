@@ -578,9 +578,10 @@ options("scipen" = 999)
 
 # preparing data for plotting
 
-dfx <- agg_dataNum
 
-dfx <- agg_dataNum %>%
+
+# an example that shows data for quarters and overall for the KPI (no sub-groups)
+  agg_dataNum %>%
   filter(
     isYearAgg == FALSE, isAngelKPI == TRUE,
     h_name == "General", nameOfAggr == "dnt_leq_60",
@@ -590,12 +591,33 @@ dfx <- agg_dataNum %>%
   ggplot(aes(x = YQ, y = Value, group = 1)) +
   geom_line(color = "#42aaf5") +
   geom_line(aes(y = C_Value), color = "grey") +
-  geom_point(aes(size = data_Pts, color = condColor)) +
+  geom_point(aes(size = log(data_Pts), color = condColor)) +
   scale_color_identity() +
-  theme_minimal() +
+  theme_minimal() +  
+  scale_y_continuous(expand = c(0.1, 0.1)) +  # Adjust margins for y-axis
   ylab("dnt less or equal to 60, in %.")
 
+#example visualization with faceting
+agg_dataNum %>%
+  filter(
+    isYearAgg == FALSE, isAngelKPI == TRUE,
+    h_name == "General",  
+    is.na(subGroup), !is.na(YQ), year == "2019"
+  ) %>%
+  mutate(condColor = ifelse(is1stDiam > 0, "#7cd461", "#4299f5")) %>%
+  ggplot(aes(x = YQ, y = Value, group = 1)) +
+  geom_line(color = "#42aaf5") +
+  geom_line(aes(y = C_Value), color = "grey") +
+  geom_point(aes(size = data_Pts, color = condColor)) +
+  scale_color_identity() +
+  theme_minimal() + 
+  scale_size_continuous(range = c(.5, 3)) +
+  facet_wrap(vars(nameOfAggr), ncol = 1, strip.position = "top")+ 
+  scale_y_continuous(limits = c(0, 100), expand=c(0,0)) +
+  coord_cartesian(clip = 'off')+ theme(panel.spacing = unit(1, "lines"))
 
+
+#example plot that uses sub-groups as a factor for the visualization - in this case 'gender'
 agg_dataNum %>%
   filter(
     isYearAgg == FALSE, isAngelKPI == TRUE,
