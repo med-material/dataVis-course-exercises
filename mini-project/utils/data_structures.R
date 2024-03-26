@@ -14,19 +14,19 @@ all_years <- 2017:2022
 
 # KPI variables -----------------------------------------------------------
 KPIs <- c(
-  "discharge_mrs",
+  "prestroke_mrs",
+  "hospitalized_in",
+  "onset_to_door",
+  "thrombectomy",
+  "thrombolysis",
   "door_to_groin",
   "door_to_imaging",
   "door_to_needle",
   "dysphagia_screening_done",
-  "onset_to_door",
-  "prestroke_mrs",
-  "three_m_mrs",
-  "thrombectomy",
-  "thrombolysis",
   "discharge_any_antiplatelet", 
   "discharge_any_anticoagulant", 
-  "hospitalized_in"
+  "discharge_mrs",
+  "three_m_mrs"
 )
 
 # key columns -------------------------------------------------------------
@@ -36,7 +36,6 @@ key_cols <- c("site_country",
               "discharge_quarter", 
               "YQ", 
               "subject_id")
-
 
 # categorical variables -----------------------------------------------------------------
 
@@ -100,8 +99,6 @@ catVars <- c(
   "hemicraniectomy",
   "hospital_stroke",
   "hospitalized_in",
-  "hunt_hess_score",
-  "ich_score",
   "imaging_done",
   "imaging_type",
   "insulin_administration",
@@ -121,30 +118,33 @@ catVars <- c(
   "risk_smoker",
   "stroke_mimics_diagnosis",
   "stroke_type",
-  "three_m_mrs",
   "thrombectomy",
-  "thrombolysis",
-  "tici_score"
+  "thrombolysis"
 )
 
 
-# numerical variables -----------------------------------------------------
+# numerical variables in order of temporal occurrence --------------------------------------------
 
 numVars <- c('age',
              'bleeding_volume_value',
+             "prestroke_mrs",
+             'nihss_score',
              'cholesterol',
+             'glucose',
              'dis_blood_pressure',
-             'discharge_nihss_score',
+             'sys_blood_pressure',
+             "ich_score",
+             'hypoperfusion_core',
+             'perfusion_core',
+             'onset_to_door',
              'door_to_groin',
              'door_to_imaging',
              'door_to_needle',
-             'glucose',
-             'hypoperfusion_core',
-             'nihss_score',
-             'onset_to_door',
-             'perfusion_core',
-             'prestroke_mrs',
-             'sys_blood_pressure'
+             "tici_score",
+             "hunt_hess_score",
+             "discharge_mrs",
+             "discharge_nihss_score",
+             "three_m_mrs"
 )
 
 # condition columns --------------------------------------------------------
