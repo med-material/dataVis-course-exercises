@@ -13,7 +13,7 @@
 install.packages("tidyverse")
 #   to make sure that it's properly installed run and watch for errors 
 library(tidyverse) 
-# 4. install nycflights13 and load it for the exercises
+# 4. install nycflights13 and load it for later exercises
 install.packages("nycflights13")
 library(nycflights)
 
@@ -32,6 +32,8 @@ summary(flights)
 # https://github.com/med-material/dataVis-course-exercises
 # see instructions here
 # https://bit.ly/DV-CinlicSteps
+
+# now continue 
 
 
 
