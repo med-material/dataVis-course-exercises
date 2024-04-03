@@ -111,7 +111,7 @@ dt
 
 ```
 
-```{r Merge}
+```{r Merge , fig.show='as-is'}
 # merge test with case data (on shared keys - date_sample+kommune)
 #create test positive variables 
 df <- as_tibble(merge(dc, dt))
@@ -123,6 +123,7 @@ df <- df %>%
     
 # check there were no diagnosis without tests
 sum(df$casesDiagnosed > df$testsConducted)
+
 ```
 
 ## Covid data analysis DK overview
