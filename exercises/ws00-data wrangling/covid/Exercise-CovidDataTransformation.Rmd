@@ -118,7 +118,7 @@ dt <- dt %>%
 dt
 ```
 
-```{r Merge}
+```{r Merge , fig.show='as-is'}
 # merge test with case data (on shared keys - date_sample+kommune)
 df <- as_tibble(merge(dc, dt))
 df
