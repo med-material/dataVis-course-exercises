@@ -1,5 +1,7 @@
 library(tidyverse)
 load(file = "mini-project/data/aggData.rda")
+load(file = "mini-project/data/datasetReduced.rda")
+
 dfx <- agg_dataNum
 
 agg_dataNum %>%
