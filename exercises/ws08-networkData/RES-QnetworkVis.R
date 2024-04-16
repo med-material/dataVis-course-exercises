@@ -1,0 +1,5 @@
+library(ggraph)
+library(igraph)
+nodes<-read.csv("data/RESQ-nodes.csv")
+edges<-read.csv("RESQ-edges.csv")
+net<-graph_from_data_frame(d=edges, vertices=nodes, directed=T)
