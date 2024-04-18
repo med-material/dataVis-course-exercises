@@ -1,7 +1,3 @@
-# library(rstatix)
-# library(googlesheets4)
-# library(gsheet)
-# library(stringr)
 library(tidyverse)
 library(igraph)
 library(ggraph)
@@ -66,7 +62,6 @@ patientRiskFactors <- c(
   "risk_hiv"
 )
 # patientRiskMeds ---------------------------------------------------------
-
 patientRiskMeds <- c(
   "before_onset_antidiabetics",
   "before_onset_antihypertensives",
@@ -87,7 +82,6 @@ patientRiskMeds <- c(
 )
 
 # ifBleedingDetails ---------------------------------------------------------
-
 ifBleedingDetails <- c(
   "infratentorial_source",
   "bleeding_source",
@@ -103,8 +97,6 @@ ifBleedingDetails <- c(
 )
 
 # imagingDetails ---------------------------------------------------------
-
-
 imagingDetails <- c(
   "imaging_type",
   "occlusion_left_mca_m1",
@@ -170,7 +162,7 @@ dischargePatientScore <- c(
 # postDischarge ---------------------------------------------------------
 postDischarge<-c(  "discharge_destination",  "three_m_mrs")
 
-# rest of code ---------------------------------------------------------
+# create the data structure ---------------------------------------------------------
 
 target_df<- data.frame(TypeOfData = character(0), ColumnName = character(0))
 
@@ -184,8 +176,10 @@ target_df<-append_vector_to_dataframe(target_df, carePerformance)
 target_df<-append_vector_to_dataframe(target_df, dischargePrescriptions)
 target_df<-append_vector_to_dataframe(target_df, dischargePatientScore)
 target_df<-append_vector_to_dataframe(target_df, postDischarge)
-
 target_df$row_number <- seq_len(nrow(target_df))
+
+
+# create nodes and edges --------------------------------------------------
 nodes<- target_df %>%
   group_by(TypeOfData) %>%
   summarize(Count = n(), OrderNumber = min(row_number)) %>%
@@ -202,18 +196,19 @@ pair_df <- merge(nodes, nodes, by = NULL) %>%
 
 edges<- pair_df %>% select(from=TypeOfData.x,to=TypeOfData.y,weight=Count.x)
 
-#create the network object for plotting
+
+# create the network object for plotting ----------------------------------
+
 net<-graph_from_data_frame(d=edges, vertices=nodes, directed=T) 
 
-ggraph(net, layout = 'manual', x = data$x, y = data$y) +
-  geom_node_point() +
-  geom_edge_link() +
-  theme_void()
+
+# Visualizing the data ----------------------------------------------------
 
 ggraph(net, layout = 'linear') + 
   geom_edge_arc(color = "orange", width=0.7) +
   geom_node_point(aes(size=Count), color="gray50") +
   theme_void()+ geom_node_text(aes(label = id), vjust = 1.5)
+
 
 layouts <- grep("^layout_", ls("package:igraph"), value=TRUE)[-1] 
 layouts <- layouts[!grepl("bipartite|merge|norm|sugiyama|tree", layouts)]
@@ -225,4 +220,23 @@ for (layout in layouts) {
   plot(net, edge.arrow.mode=2, layout=l, main=layout, edge.arrow.size = 0.2) }
 dev.off()
 plot(net, edge.arrow.mode=2, layout=do.call("layout_in_circle", list(net)) , main="layout_in_circle", edge.arrow.size = 0.2)
+
+#other options
+#  "layout_as_star"
+#  "layout_components"
+#  "layout_in_circle"
+#  "layout_nicely"
+#  "layout_on_grid"
+#  "layout_on_sphere"
+#  "layout_randomly"
+#  "layout_with_dh"
+#  "layout_with_drl"
+#  "layout_with_fr"
+#  "layout_with_gem"
+#  "layout_with_graphopt"
+#  "layout_with_kk"
+#  "layout_with_lgl"
+#  "layout_with_mds"
+
+
 
