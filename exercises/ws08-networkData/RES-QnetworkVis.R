@@ -3,6 +3,7 @@ library(igraph)
 library(tidyverse)
 script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(script_path)
+
 #load the data
 nodes<-read.csv("data/RESQ-nodes.csv")
 edges<-read.csv("data/RESQ-edges.csv")
