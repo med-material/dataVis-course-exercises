@@ -4,20 +4,17 @@ script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(script_path)
 
 df<-read.csv("ov.csv")
-# below find an example with a different dataset
-
-
+# find examples with a different/synthetic dataset below
 # Create example sample data ----
 dfe <- expand.grid(x = 1:5, y = 1:5)
 dfe$z <- sample(1:25, nrow(dfe))  # Random values
-
+# example geom_tile() ----
 ggplot(dfe, aes(x, y, fill = z)) +
   geom_tile() +  # Heatmap
   geom_text(aes(label = z), color = "white") +  # Overlay text
   scale_fill_viridis_c() + 
   theme_minimal()
-
-
+# example adding points on top ----
 ggplot(dfe, aes(x, y)) +
   geom_tile(aes(fill = z), alpha = 0.8) +  # Slight transparency
   geom_point(size = 4, color = "red") +  # Overlay points
