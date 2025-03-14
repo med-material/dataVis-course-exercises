@@ -9,7 +9,7 @@ dataset <- tibble::as_tibble(read.csv("../../mini-project/data/dataREanonymized.
 append_vector_to_dataframe <- function(target_df, vector) {
   # Get the name of the vector
   vector_name <- deparse(substitute(vector))
-  
+  # browser()
   # Create a data frame from the vector
   df <- data.frame(TypeOfData = vector_name, ColumnName = vector)
   
@@ -20,8 +20,8 @@ append_vector_to_dataframe <- function(target_df, vector) {
   return(target_df)
 }
 
-#listOfParameterLists<-list(patientCharacteristics,strokeCharacteristics)
 
+#listOfParameterLists<-list(patientCharacteristics,strokeCharacteristics)
 # set variable sets
 # patientCharacteristics ---------------------------------------------------------
 patientCharacteristics<-c(
