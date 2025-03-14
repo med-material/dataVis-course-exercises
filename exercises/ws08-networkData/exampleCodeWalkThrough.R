@@ -40,4 +40,4 @@ routes_network <- network(edges,
 
 plot(routes_network, vertex.cex = 3)
 
-
+plot(routes_network, vertex.cex = 3, mode = "circle")
