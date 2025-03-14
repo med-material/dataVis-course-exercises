@@ -1,5 +1,5 @@
 library(shiny)
-
+library(plotly) 
 # cache computation of the correlation matrix
 correlation <- round(cor(mtcars), 3)
 
