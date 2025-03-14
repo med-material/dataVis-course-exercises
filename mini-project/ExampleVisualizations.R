@@ -1,6 +1,8 @@
 library(tidyverse)
-load(file = "mini-project/data/aggData.rda")
-load(file = "mini-project/data/datasetReduced.rda")
+script_path <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(script_path)
+load(file = "data/aggData.rda")
+load(file = "data/datasetReduced.rda")
 
 dfx <- agg_dataNum
 
@@ -12,8 +14,8 @@ agg_dataNum %>%
   ) %>%
   mutate(condColor = ifelse(is1stDiam > 0, "#7cd461", "#4299f5")) %>%
   ggplot(aes(x = YQ, y = Value, group = 1)) +
+  geom_line(aes(x = YQ,y = C_Value), linewidth=3,color = "lightgrey") +
   geom_line(color = "#42aaf5") +
-  geom_line(aes(y = C_Value), color = "grey") +
   geom_point(aes(size = data_Pts, color = condColor)) +
   scale_color_identity() +
   theme_minimal() +
