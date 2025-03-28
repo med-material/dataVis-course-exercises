@@ -94,9 +94,9 @@ summaryBiasByWard <-df %>%
 # To avoid overplotting you will need to use facet_grid() e.g. by faceting by position_within and party.  
 # In order to see the small differences in the bias you need to figure out a good colour scheme, which also takes care of missing (na) values by making them less prominent. 
 
-ggplot(summaryBiasByWard,aes(x= ???,y= ???,fill=meanBias))+
+ggplot(summaryBiasByWard,aes(x= WardCol,y= WardRow,fill=potentialBias))+
   geom_tile()+
-  facet_grid(cols = vars(????),rows = vars(????))+
+  facet_grid(cols = vars(position_within),rows = vars(party))+
   scale_fill_gradient2(midpoint = 0,
                      low = 'green2',
                      mid = 'yellow',
@@ -107,11 +107,5 @@ ggplot(summaryBiasByWard,aes(x= ???,y= ???,fill=meanBias))+
 
   
 
-ggplot(summaryBiasByWard,aes(x=WardCol,y=WardRow,fill=potentialBias))+
-  geom_tile()+theme_bw()+ 
-  facet_grid(cols = vars(position_within),rows = vars(party))+
-  scale_fill_gradient2(midpoint = 0, low = 'green2', mid = 'white', high = 'red3', na.value = 'white')
-
-  
 
 
