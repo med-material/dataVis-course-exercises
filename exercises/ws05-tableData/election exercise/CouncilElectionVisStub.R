@@ -8,7 +8,7 @@ df <- read.csv(here("exercises", "ws05-tableData", "election exercise", "london_
 df$number_votes <- as.numeric(df$number_votes)
 
 
-# create the position for each candidate in alphabetical order per ward and party
+# create the position for each candidate in alphabetical order per ward and per party - remove candidates with a rank higher than three
 df <- df %>%
   group_by(Ward_code, party) %>%
   arrange(candidate) %>%
